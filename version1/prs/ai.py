@@ -46,8 +46,11 @@ class KeywordFallbackClassifier(AIModel):
 
 
 class OllamaClassifier(AIModel):
-    """Local LLM via Ollama (http://localhost:11434)."""
-    def __init__(self, model="llama3.2", url="http://localhost:11434/api/generate"):
+    """LLM via an Ollama server (default: expressgameserver, qwen3.5:9b)."""
+    REMOTE_URL = "http://expressgameserver:11434/api/generate"
+    LOCAL_URL = "http://localhost:11434/api/generate"
+
+    def __init__(self, model="qwen3.5:9b", url=REMOTE_URL):
         self.model = model
         self.url = url
         self.name = f"ollama:{model}"
@@ -56,9 +59,9 @@ class OllamaClassifier(AIModel):
         prompt = (f"Classify this clinical visit note into exactly one of: {', '.join(CATEGORIES)}.\n"
                   f"Patient context: {patient_context}\nNote: {text}\n"
                   "Answer with only the category name, or UNSURE.")
-        body = json.dumps({"model": self.model, "prompt": prompt, "stream": False}).encode()
+        body = json.dumps({"model": self.model, "prompt": prompt, "stream": False, "think": False}).encode()
         req = urllib.request.Request(self.url, body, {"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             answer = json.load(resp)["response"].strip()
         for cat in CATEGORIES:
             if cat.lower() in answer.lower():

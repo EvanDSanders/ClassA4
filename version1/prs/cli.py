@@ -1,19 +1,19 @@
 """Command-line user interface."""
 import getpass
 
-from .ai import AIController, KeywordFallbackClassifier, OllamaClassifier
+from .ai import AIController, OllamaClassifier
 from .auth import AuthenticationService, PermissionDenied
 from .database import Database
 from .services import PatientService
 
 
 class CLI:
-    def __init__(self, db_path="prs.db", use_ollama=False):
+    def __init__(self, db_path="prs.db", model=None):
         self.db = Database(db_path)
         self.auth = AuthenticationService(self.db)
         self.auth.seed_demo_users()
         self.patients = PatientService(self.db)
-        self.ai = AIController(OllamaClassifier() if use_ollama else KeywordFallbackClassifier())
+        self.ai = AIController(model or OllamaClassifier())
         self.user = None
 
     def run(self):

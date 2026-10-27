@@ -3,8 +3,11 @@
 Requires Python 3.9+; no third-party packages.
 
     cd version1
-    python3 main.py            # keyword fallback classifier (NOT an AI model)
-    python3 main.py --ollama   # local LLM via Ollama (needs `ollama serve` + `ollama pull llama3.2`)
+    python3 main.py                  # default: qwen3.5:9b on expressgameserver (Ollama)
+    python3 main.py --local llama3.2 # local Ollama model on localhost
+    python3 main.py --keyword        # keyword fallback (test substitute, NOT an AI model)
+
+If the AI server is unreachable, notes still save without a category.
 
 Data persists in `prs.db` (SQLite). Demo users (synthetic):
 

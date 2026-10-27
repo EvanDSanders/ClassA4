@@ -1,0 +1,4 @@
+{% extends "prs/base.html" %}{% block content %}
+<h2>Edit {{ patient.patient_id }}</h2><p>Patient ID is permanent and cannot be edited.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Save</button></form>
+{% endblock %}

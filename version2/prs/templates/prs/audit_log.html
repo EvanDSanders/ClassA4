@@ -1,0 +1,5 @@
+{% extends "prs/base.html" %}{% block content %}
+<h2>Audit log</h2>
+<table><tr><th>When</th><th>User</th><th>Action</th><th>Patient</th><th>Previous</th><th>Current</th></tr>
+{% for e in entries %}<tr><td>{{ e.at|date:"Y-m-d H:i:s" }}</td><td>{{ e.username }}</td><td>{{ e.action }}</td><td>{{ e.patient_id }}</td><td>{{ e.previous }}</td><td>{{ e.current }}</td></tr>{% endfor %}</table>
+{% endblock %}

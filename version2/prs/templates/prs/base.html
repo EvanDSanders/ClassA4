@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>PRS</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:0 auto;padding:1rem;color:#222}
+nav{display:flex;gap:1rem;align-items:center;border-bottom:1px solid #ccc;padding-bottom:.5rem;margin-bottom:1rem}
+nav form{margin-left:auto}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:.3rem .5rem;text-align:left}
+.msg{padding:.5rem;margin:.3rem 0;background:#eef}.msg.error{background:#fee}.msg.success{background:#efe}
+input,textarea{width:100%;box-sizing:border-box;padding:.3rem}label{display:block;margin-top:.6rem}
+button{padding:.3rem .8rem;cursor:pointer}.inline{display:inline}.errorlist{color:#b00;margin:0}
+.card{border:1px solid #ccc;padding:.6rem;margin:.6rem 0;border-radius:4px}
+</style></head><body>
+<nav><strong>Patient Record System</strong>
+{% if user.is_authenticated %}
+  {% if user.staff_profile %}
+    <a href="{% url 'patient_search' %}">Patients</a>
+    <a href="{% url 'patient_register' %}">Register</a>
+    <a href="{% url 'request_queue' %}">Change requests</a>
+    {% if user.staff_profile.role == 'supervisor' %}<a href="{% url 'audit_log' %}">Logs</a>{% endif %}
+  {% else %}<a href="{% url 'portal' %}">My record</a>{% endif %}
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Log out ({{ user.username }})</button></form>
+{% endif %}
+</nav>
+{% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+{% block content %}{% endblock %}
+</body></html>

@@ -1,0 +1,10 @@
+{% extends "prs/base.html" %}{% block content %}
+<h2>My record</h2>
+<p>Patient ID: <strong>{{ patient.patient_id }}</strong><br>Name: {{ patient.name }}<br>Birthday: {{ patient.birthday }}<br>Address: {{ patient.address }}<br>Phone: {{ patient.phone }}</p>
+<h3>Request a change</h3><p>Changes are reviewed by staff before they take effect.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Submit request</button></form>
+<h3>My requests</h3>
+<ul>{% for r in requests %}<li>{{ r.created_at|date:"Y-m-d H:i" }}: {{ r.new_name }} / {{ r.new_address }} / {{ r.new_phone }} - <strong>{{ r.get_status_display }}</strong></li>{% empty %}<li>None</li>{% endfor %}</ul>
+<h3>Visit notes</h3>
+{% for n in notes %}<div class="card"><small>{{ n.created_at|date:"Y-m-d H:i" }}</small><p>{{ n.text|linebreaksbr }}</p>{% if n.category %}<p>Category: {{ n.category }}</p>{% endif %}</div>{% empty %}<p>No notes.</p>{% endfor %}
+{% endblock %}

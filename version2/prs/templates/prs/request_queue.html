@@ -1,0 +1,11 @@
+{% extends "prs/base.html" %}{% block content %}
+<h2>Pending change requests</h2>
+{% for r in requests %}<div class="card"><strong>{{ r.patient.patient_id }}</strong> ({{ r.created_at|date:"Y-m-d H:i" }})
+<table><tr><th></th><th>Current</th><th>Requested</th></tr>
+<tr><td>Name</td><td>{{ r.patient.name }}</td><td>{{ r.new_name }}</td></tr>
+<tr><td>Address</td><td>{{ r.patient.address }}</td><td>{{ r.new_address }}</td></tr>
+<tr><td>Phone</td><td>{{ r.patient.phone }}</td><td>{{ r.new_phone }}</td></tr></table>
+<form method="post" action="{% url 'request_review' r.id %}">{% csrf_token %}
+<button name="decision" value="approve">Approve</button> <button name="decision" value="reject">Reject</button></form></div>
+{% empty %}<p>No pending requests.</p>{% endfor %}
+{% endblock %}

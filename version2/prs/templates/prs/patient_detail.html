@@ -1,0 +1,20 @@
+{% extends "prs/base.html" %}{% block content %}
+<h2>{{ patient.name }} <small>({{ patient.patient_id }})</small></h2>
+<p>Birthday: {{ patient.birthday }}<br>Address: {{ patient.address }}<br>Phone: {{ patient.phone }}</p>
+<a href="{% url 'patient_edit' patient.patient_id %}">Edit</a>
+<h3>Add visit note</h3>
+<form method="post" action="{% url 'note_add' patient.patient_id %}">{% csrf_token %}{{ note_form.as_p }}<button>Save note</button></form>
+<h3>Visit history</h3>
+{% for n in notes %}<div class="card"><small>{{ n.created_at|date:"Y-m-d H:i" }} by {{ n.author.username }}</small>
+<p>{{ n.text|linebreaksbr }}</p>
+{% if n.category_status == 'pending' %}
+  <p>AI suggests: <strong>{{ n.suggested_category }}</strong>
+  <form class="inline" method="post" action="{% url 'note_resolve' n.id %}">{% csrf_token %}
+  <button name="decision" value="accept">Accept</button> <button name="decision" value="reject">Reject</button></form></p>
+{% elif n.category_status == 'accepted' %}<p>Category: <strong>{{ n.category }}</strong></p>
+{% elif n.category_status == 'rejected' %}<p>Suggestion rejected ({{ n.suggested_category }})</p>
+{% else %}<p><em>Uncategorized. {{ n.ai_message }}</em></p>{% endif %}</div>
+{% empty %}<p>No notes.</p>{% endfor %}
+<h3>Change requests</h3>
+<ul>{% for r in requests %}<li>{{ r.created_at|date:"Y-m-d" }}: {{ r.new_name }} / {{ r.new_address }} / {{ r.new_phone }} - {{ r.get_status_display }}</li>{% empty %}<li>None</li>{% endfor %}</ul>
+{% endblock %}

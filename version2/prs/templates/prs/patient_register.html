@@ -1,0 +1,4 @@
+{% extends "prs/base.html" %}{% block content %}
+<h2>Register patient</h2><p>The Patient ID is generated automatically.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Register</button></form>
+{% endblock %}

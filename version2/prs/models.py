@@ -40,6 +40,14 @@ def generate_patient_id() -> str:
     return "P" + secrets.token_hex(4).upper()
 
 
+class PatientQuerySet(models.QuerySet["Patient"]):
+    """Queryset that refuses bulk deletion so Patient IDs are never freed for reuse."""
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        """Always refuse: patient records are permanent."""
+        raise ImmutableFieldError("Patient records cannot be deleted")
+
+
 class Patient(models.Model):
     """A patient record. ``patient_id`` is unique, DB-enforced and immutable (FR-01)."""
 
@@ -52,6 +60,7 @@ class Patient(models.Model):
     birthday = models.DateField()
     phone = models.CharField(max_length=30, blank=True)
 
+    objects = PatientQuerySet.as_manager()
     _original_patient_id: str | None = None
 
     @classmethod
@@ -67,6 +76,10 @@ class Patient(models.Model):
             raise ImmutableFieldError("patient_id cannot be changed")
         super().save(*args, **kwargs)
         self._original_patient_id = self.patient_id
+
+    def delete(self, *args: Any, **kwargs: Any) -> tuple[int, dict[str, int]]:
+        """Always refuse: deleting would free the Patient ID for reuse."""
+        raise ImmutableFieldError("Patient records cannot be deleted")
 
     def __str__(self) -> str:
         """Return a readable label."""

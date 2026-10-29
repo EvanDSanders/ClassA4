@@ -1,11 +1,10 @@
 """AI Categorizer component: AIModel interface, classifiers and AIController (AIR-01, AIR-02)."""
 from __future__ import annotations
 
-import json
-import urllib.request
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+import ollama
 from django.conf import settings
 
 from .models import CATEGORIES
@@ -52,11 +51,10 @@ class KeywordFallbackClassifier(AIModel):
 class OllamaClassifier(AIModel):
     """LLM categorizer using an Ollama server."""
 
-    def __init__(self, model: str, url: str, timeout: int = 60) -> None:
-        """Store the model name, endpoint URL and request timeout (seconds)."""
+    def __init__(self, model: str, host: str, timeout: int = 60) -> None:
+        """Store the model name and create a client for the Ollama ``host``."""
         self.model = model
-        self.url = url
-        self.timeout = timeout
+        self.client = ollama.Client(host=host, timeout=timeout)
         self.name = f"ollama:{model}"
 
     def classify(self, text: str, patient_context: str = "") -> Suggestion | None:
@@ -64,11 +62,8 @@ class OllamaClassifier(AIModel):
         prompt = (f"Classify this clinical visit note into exactly one of: {', '.join(CATEGORIES)}.\n"
                   f"Patient context: {patient_context}\nNote: {text}\n"
                   "Answer with only the category name, or UNSURE.")
-        body = json.dumps({"model": self.model, "prompt": prompt, "stream": False,
-                           "think": False}).encode()
-        request = urllib.request.Request(self.url, body, {"Content-Type": "application/json"})
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:
-            answer = json.load(response)["response"].strip().lower()
+        response = self.client.generate(model=self.model, prompt=prompt, think=False)
+        answer = response["response"].strip().lower()
         for category in CATEGORIES:
             if category.lower() in answer:
                 return Suggestion(category, self.name)
@@ -97,4 +92,4 @@ def build_controller() -> AIController:
     """Create the AIController configured in Django settings."""
     if settings.AI_BACKEND == "keyword":
         return AIController(KeywordFallbackClassifier())
-    return AIController(OllamaClassifier(settings.AI_MODEL, settings.AI_SERVER_URL))
+    return AIController(OllamaClassifier(settings.AI_MODEL, settings.AI_HOST))

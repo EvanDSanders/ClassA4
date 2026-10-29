@@ -8,13 +8,13 @@ DEBUG: bool = os.environ.get("PRS_DEBUG", "1") == "1"
 ALLOWED_HOSTS: list[str] = ["*"] if DEBUG else ["localhost", "127.0.0.1"]
 
 INSTALLED_APPS = [
+    "prs",  # must precede staticfiles so its runserver override wins
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "prs",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -54,6 +54,6 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
 
-AI_SERVER_URL: str = os.environ.get("PRS_AI_URL", "http://expressgameserver:11434/api/generate")
+AI_HOST: str = os.environ.get("PRS_AI_HOST", "http://expressgameserver:11434")
 AI_MODEL: str = os.environ.get("PRS_AI_MODEL", "qwen3.5:9b")
 AI_BACKEND: str = os.environ.get("PRS_AI_BACKEND", "ollama")  # "ollama" or "keyword"

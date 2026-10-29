@@ -11,7 +11,7 @@
 ## AI categorizer
 Default: `qwen3.5:9b` on Ollama at `http://expressgameserver:11434`. Environment overrides:
 
-    PRS_AI_URL=http://localhost:11434/api/generate PRS_AI_MODEL=llama3.2 python manage.py runserver
+    PRS_AI_HOST=http://localhost:11434 PRS_AI_MODEL=llama3.2 python manage.py runserver
     PRS_AI_BACKEND=keyword python manage.py runserver   # rule-based fallback, NOT AI
 
 If the AI is down or unsure, notes are still saved without a category.
